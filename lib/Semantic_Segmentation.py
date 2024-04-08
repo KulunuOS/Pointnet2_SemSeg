@@ -147,7 +147,8 @@ class SemanticSegmentation(nn.Module):
         # Forward pass through final classification layer
         per_point_labels = self.classification_layer(features)
 
-        return per_point_labels   
+        return per_point_labels 
+  
     
 if __name__ == "__main__":
 

@@ -12,6 +12,13 @@ This dataloader assumes that you have
     3. saved the [label, index] for the sampled point cloud
 
 """
+scene_id_leading_zeros = 0
+img_id_leading_zeros = 0
+rgb_format = '.png'
+dpt_format = '.png'
+msk_format = '.png'
+seg_format = '.npy'
+
 
 class Dataset():
 
@@ -25,17 +32,27 @@ class Dataset():
 
             
     def get_item(self, idx):
+
         try:
+            with Image.open(os.path.join(self.rgb_dir,str(idx).zfill(img_id_leading_zeros)+ rgb_format)) as ri:
+                rgb = np.array(ri)[:, :, :3]
+                rgb = np.transpose(rgb, (2, 0, 1))
+
             with open(os.path.join(self.dir, 'cld_rgb_nrms/{}.pkl'.format(idx)),'rb') as f:
                     cld_rgb_nrms = pkl.load(f)
-                    
-            labels = np.load(os.path.join(self.dir, 'labels/{}.npy'.format(idx)))
-            cld_rgb_nrms = np.asarray(cld_rgb_nrms)
-        
-        except:
-             print("Problem while trying to load data")
 
-        return torch.LongTensor(labels.astype(np.int32)), torch.from_numpy(cld_rgb_nrms.astype(np.float32))
+            label_data = np.load(os.path.join(self.dir, 'labels/{}.npy'.format(idx)), allow_pickle=True)
+            
+            labels = label_data[0]
+            choose = label_data[1]
+            cld_rgb_nrms = np.asarray(cld_rgb_nrms)
+
+        except:
+            print("Error occured while loading data")     
+        
+        return torch.LongTensor(labels.astype(np.int32)),\
+               torch.from_numpy(cld_rgb_nrms.astype(np.float32)), torch.LongTensor(choose.astype(np.int32)),\
+               torch.from_numpy(rgb.astype(np.float32))
     
     def __len__(self):
         return len(os.listdir(self.rgb_dir))

@@ -30,7 +30,7 @@ class_weights = torch.tensor([1.0, 2.0, 10.0, 2.0, 2.0, 2.0])
 alpha_values = [0.005, 0.095, 0.6, 0.05,0.2,0.05]
 
 #root_path = "/media/kulunu/Elements SE/Datasets/Nema17_reducer_dataset"
-root_path = "/projappl/project_2003042/datasets/Nema17_reducer_dataset"
+root_path = "/projappl/project_2003042/Pointnet2_SemSeg/datasets/Nema17_reducer_dataset"
 scene_id =  "stage_1"
 
 dataset = Dataset(root_path,scene_id) 
@@ -102,8 +102,13 @@ if __name__ == "__main__":
             choose, rgb = choose.to(device), rgb.to(device)
             
             optimizer.zero_grad()
+            
             outputs = model(cld_rgb_nrm,rgb,choose)
-            loss = criterion(outputs, labels)
+
+            #print("out", outputs.shape)
+            #print("labels", labels.shape)
+
+            loss = criterion(outputs.view(labels.numel(), -1), labels.view(-1))
             loss.backward()
             optimizer.step()
             train_loss += loss.item()

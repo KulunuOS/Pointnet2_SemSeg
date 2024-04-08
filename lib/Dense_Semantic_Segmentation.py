@@ -182,9 +182,12 @@ class DenseSemanticSegmentation(nn.Module):
 
     def forward(self, pointcloud, rgb, choose):
 
+   
         out_rgb, rgb_seg = self.cnn(rgb)
         bs, di, _, _ = out_rgb.size()
-        choose = choose.repeat(1, di, 1)
+        #choose = choose.repeat(1, di, 1)
+        choose = choose.unsqueeze(1).repeat(1, di, 1)
+        rgb_emb = out_rgb.view(bs, di, -1)   
         rgb_emb = torch.gather(rgb_emb, 2, choose).contiguous()
 
         # Forward pass through Pointnet2MSG

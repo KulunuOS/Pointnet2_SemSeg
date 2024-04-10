@@ -26,10 +26,11 @@ class Dataset():
         
         #self.dataset_name = dataset_name
         self.root_dir = root_path
-        self.dat_dir = root_path + "/" + scene_id
-        self.dir = self.dat_dir
-        self.rgb_dir = self.dir +'/rgb' 
-
+        self.dir = root_path + "/" + scene_id
+        self.rgb_dir = self.dir +'/rgb'
+        self.dpt_dir = self.dir+'/depth'
+        self.segmap_dir = self.dir+'/seg_maps'
+        self.n_sample_points = 8192 + 4096   #12288
             
     def get_item(self, idx):
 
@@ -56,6 +57,27 @@ class Dataset():
     
     def __len__(self):
         return len(os.listdir(self.rgb_dir))
+    
+    def get_cam_info(self,idx):
+                scene_cam_path = os.path.join(self.dir,'scene_camera.json')
+                if os.path.exists(scene_cam_path): 
+                    with open(scene_cam_path,"r") as k:
+                        for i,j in enumerate(k):
+                            im_dict = json.loads(j)
+                            if i == idx:
+                                this_cam = im_dict
+                                
+                        cam_K = this_cam[str(idx)]['cam_K']
+                        dpt_cam_K = this_cam[str(idx)]['dpt_cam_K']
+                        K = np.array(cam_K).reshape(3,3)
+                        dpt_K = np.array(dpt_cam_K).reshape(3,3)
+                        cam_scale =  this_cam[str(idx)]['depth_scale']
+
+                    return K,dpt_K, cam_scale
+
+                else:
+                    print("missing scene_camera.json :")
+                    
     
     def __getitem__(self, idx):
         data = self.get_item(idx)

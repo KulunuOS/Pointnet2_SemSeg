@@ -15,6 +15,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 import torch.optim.lr_scheduler as lr_scheduler
 import torch.nn.functional as F
+from lib.utils.sync_batchnorm import convert_model
 
 import lib.utils.etw_pytorch_utils as pt_utils
 from lib.pointnet2_utils.pointnet2_modules import PointnetFPModule, PointnetSAModuleMSG
@@ -35,10 +36,10 @@ scene_id =  "stage_1"
 
 dataset = Dataset(root_path,scene_id) 
 
-num_epochs = 50
+num_epochs = 120
 in_channels = 6
 n_classes = 6
-batch_size = 4
+batch_size = 8
 validation_split = 0.2
 shuffle_dataset = True
 random_seed = 42
@@ -70,16 +71,22 @@ if __name__ == "__main__":
         dataset, batch_size= batch_size, shuffle=False,sampler=valid_sampler,
         num_workers=10)
 
-    model = DenseSemanticSegmentation(input_channels=6, num_classes=6)
+    model = DenseSemanticSegmentation(input_channels=6, num_classes=6).cuda()
     #model = SemanticSegmentation(input_channels=6, num_classes=6)
+    #model = DenseSemanticSegmentation(input_channels=6, num_classes=6)
 
     criterion = FocalLoss(alpha=None, gamma=2)
 
     optimizer = optim.Adam(model.parameters(), lr=0.01)
     scheduler = create_scheduler(optimizer, mode='step', step_size=10, gamma=0.5)
 
+
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    #model.to(device)
+    model = convert_model(model)
+    model.cuda()
+    model = nn.DataParallel(model)
 
 
     train_losses = []
@@ -98,22 +105,25 @@ if __name__ == "__main__":
         # Training phase
         for i, batch in enumerate(tqdm(train_loader)):
             labels, cld_rgb_nrm, choose, rgb = batch
-            cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
-            choose, rgb = choose.to(device), rgb.to(device)
+            #cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
+            #choose, rgb = choose.to(device), rgb.to(device)
+
+            cld_rgb_nrm, labels = cld_rgb_nrm.cuda(), labels.cuda()
+            choose, rgb = choose.cuda(), rgb.cuda()
             
             optimizer.zero_grad()
             
             outputs = model(cld_rgb_nrm,rgb,choose)
+            outputs = outputs.view(labels.numel(),-1)
+            labels = labels.view(-1)
 
-            #print("out", outputs.shape)
-            #print("labels", labels.shape)
-
-            loss = criterion(outputs.view(labels.numel(), -1), labels.view(-1))
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             train_loss += loss.item()
             
             _, predicted_train = torch.max(outputs, 1)
+        
             mask = labels != 0
             total_train +=  mask.sum().item()
             correct_train += (predicted_train[mask] == labels[mask]).sum().item()
@@ -132,13 +142,18 @@ if __name__ == "__main__":
         with torch.no_grad():
             for i, batch in enumerate(tqdm(val_loader)):
                 labels, cld_rgb_nrm, choose, rgb = batch
-                cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
-                choose, rgb = choose.to(device), rgb.to(device)
-            
-                outputs = model(cld_rgb_nrm)
+                #cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
+                #choose, rgb = choose.to(device), rgb.to(device)
+
+                cld_rgb_nrm, labels = cld_rgb_nrm.cuda(), labels.cuda()
+                choose, rgb = choose.cuda(), rgb.cuda()
+
+                outputs = model(cld_rgb_nrm,rgb,choose)
+                outputs = outputs.view(labels.numel(), -1)
+                labels = labels.view(-1)
+
                 loss = criterion(outputs, labels)
                 val_loss += loss.item()
-                
                 _, predicted = torch.max(outputs, 1)
                 
                 

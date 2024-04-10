@@ -84,7 +84,8 @@ class FocalLoss(nn.Module):
         if self.alpha is not None:
             # Apply class weights based on alpha
             alpha_tensor = torch.tensor(self.alpha, device=inputs.device)
-            alpha_factor = alpha_tensor[target].unsqueeze(1)
+            #alpha_factor = alpha_tensor[target].unsqueeze(1)
+            alpha_factor = alpha_tensor[target.view(-1)].view_as(target)
             
         else:
             alpha_factor = 1.0
@@ -93,7 +94,14 @@ class FocalLoss(nn.Module):
         focal_weight = torch.pow(1 - F.softmax(inputs, dim=1), self.gamma)
         # Compute focal loss
         ce_loss = F.cross_entropy(inputs, target, reduction='none')
-        focal_loss = alpha_factor * focal_weight.unsqueeze(1) * ce_loss.unsqueeze(1)
+        #focal_loss = alpha_factor * focal_weight.unsqueeze(1) * ce_loss.unsqueeze(1)
+        #print("alpha_factor",alpha_factor.shape)
+        #print("focal_weight",focal_weight.shape)
+        #print("ce_loss", ce_loss.shape)
+
+
+        #focal_loss = alpha_factor * focal_weight * ce_loss
+        focal_loss = focal_weight * ce_loss.unsqueeze(1)
 
         # Apply reduction method
         if self.reduction == 'mean':

@@ -1,2 +1,4 @@
 build/
+checkpoints/
+jupyter_notebooks/lib/
 *.so

@@ -9,8 +9,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import torch.nn.functional as F
 from lib.utils.sync_batchnorm import convert_model
 
-from lib.Semantic_Segmentation import SemanticSegmentation
-
+from lib.Dense_Semantic_Segmentation import DenseSemanticSegmentation
 
 from lib.custom_dataloader import Dataset
 from lib.seg_utils import plot_graphs, FocalLoss,create_scheduler
@@ -63,8 +62,8 @@ if __name__ == "__main__":
         dataset, batch_size= batch_size, shuffle=False,sampler=valid_sampler,
         num_workers=10)
 
-    #model = DenseSemanticSegmentation(input_channels=6, num_classes=6).cuda()
-    model = SemanticSegmentation(input_channels=6, num_classes=6)
+    model = DenseSemanticSegmentation(input_channels=6, num_classes=6).cuda()
+    #model = SemanticSegmentation(input_channels=6, num_classes=6)
     #model = DenseSemanticSegmentation(input_channels=6, num_classes=6)
 
     criterion = FocalLoss(alpha=None, gamma=2)
@@ -96,12 +95,19 @@ if __name__ == "__main__":
         
         # Training phase
         for i, batch in enumerate(tqdm(train_loader)):
-            labels, cld_rgb_nrm,_, _ = batch
-            cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
-                  
-            optimizer.zero_grad()    
-            outputs = model(cld_rgb_nrm)
-    
+            labels, cld_rgb_nrm, choose, rgb = batch
+            #cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
+            #choose, rgb = choose.to(device), rgb.to(device)
+
+            cld_rgb_nrm, labels = cld_rgb_nrm.cuda(), labels.cuda()
+            choose, rgb = choose.cuda(), rgb.cuda()
+            
+            optimizer.zero_grad()
+            
+            outputs = model(cld_rgb_nrm,rgb,choose)
+            outputs = outputs.view(labels.numel(),-1)
+            labels = labels.view(-1)
+
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
@@ -126,12 +132,17 @@ if __name__ == "__main__":
         
         with torch.no_grad():
             for i, batch in enumerate(tqdm(val_loader)):
-                labels, cld_rgb_nrm, _,_ = batch
-     
-                cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
-    
-                outputs = model(cld_rgb_nrm)
-    
+                labels, cld_rgb_nrm, choose, rgb = batch
+                #cld_rgb_nrm, labels = cld_rgb_nrm.to(device), labels.to(device)
+                #choose, rgb = choose.to(device), rgb.to(device)
+
+                cld_rgb_nrm, labels = cld_rgb_nrm.cuda(), labels.cuda()
+                choose, rgb = choose.cuda(), rgb.cuda()
+
+                outputs = model(cld_rgb_nrm,rgb,choose)
+                outputs = outputs.view(labels.numel(), -1)
+                labels = labels.view(-1)
+
                 loss = criterion(outputs, labels)
                 val_loss += loss.item()
                 _, predicted = torch.max(outputs, 1)

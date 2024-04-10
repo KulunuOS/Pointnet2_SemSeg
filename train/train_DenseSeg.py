@@ -19,7 +19,7 @@ from tqdm import tqdm
 class_weights = torch.tensor([1.0, 2.0, 10.0, 2.0, 2.0, 2.0])
 alpha_values = [0.005, 0.095, 0.6, 0.05,0.2,0.05]
 
-# TODO : take the root path, scene_id and checkpoint path as arguments
+# TODO : take the root path, scene_id, batc h_no, epochs and checkpoint path as arguments
 
 #root_path = "/media/kulunu/Elements SE/Datasets/Nema17_reducer_dataset"
 root_path = "/projappl/project_2003042/Pointnet2_SemSeg/datasets/Nema17_reducer_dataset"

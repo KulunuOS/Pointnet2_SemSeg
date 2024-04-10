@@ -12,6 +12,8 @@ This dataloader assumes that you have
     3. saved the [label, index] for the sampled point cloud
 
 """
+# TODO: add below to arguments
+
 scene_id_leading_zeros = 0
 img_id_leading_zeros = 0
 rgb_format = '.png'

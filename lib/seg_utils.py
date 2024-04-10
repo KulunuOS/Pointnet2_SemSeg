@@ -7,6 +7,9 @@ import torch.nn.functional as F
 import numpy as np
 import cv2
 
+
+# TODO : add credentials for imported code snippets
+
 def plot_graphs(train_losses, val_losses, train_accuracies, val_accuracies, epoch,fn):
     # Create subplots for loss and accuracy
     fig, axs = plt.subplots(1, 2, figsize=(12, 6))

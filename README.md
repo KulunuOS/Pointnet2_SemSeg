@@ -1,5 +1,11 @@
 # Pointnet2_SemSeg
+
 Sematic Segmentation of tabletop object scene using pointnet2
+
+<figure align="center" style="padding-top: 20px; padding-bottom: 20px;">
+  <img src="/assets/semantic_segmentation_result.gif"/>
+  <figcaption>  <p style="text-align: center; font-size: 12px"> source: <a href="https://developer.nvidia.com/blog/transferring-industrial-robot-assembly-tasks-from-simulation-to-reality/">  Transferring Industrial Robot Assembly Tasks from Simulation (NVIDIA Isaac) to Real</a></p> </figcaption>
+</figure>
 
 
 ## Installation

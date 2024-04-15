@@ -35,24 +35,24 @@ $ python3 setup.py build_ext
 
 ## Step 3: Train
 
-3.1 To train the network with only geometric features
+### 3.1 To train the network with only geometric features
 
 ```
 $ python3 -m tarin.train_Seg.py
 ```
-Training above for proved that learning alone on geometric information is challenging for a dataset with higher class imbalance even without factors such as noise, occlusions, non dataset objects etc.
+- Training above for proved that learning alone on geometric information is challenging for a dataset with higher class imbalance even without factors such as noise, occlusions, non dataset objects etc.
 The validation accuracy did not exceed 30%
 
 ![ Accuracy and loss logs of pointnet++ semantic segmentation with RGBD features](assets/GeometricFeatures_epoch_100.png)
 
 
-3.2 To train the network with fused geometric and appearance (Depth + RGB) features
+### 3.2 To train the network with fused geometric and appearance (Depth + RGB) features
 
 ```
 $ python3 -m tarin.train_DenseSeg.py
 ```
 
-Training on DenseFused RGB features and Geometric features proved effective with validation accuracy above 90%
+- Training on DenseFused RGB features and Geometric features proved effective with validation accuracy above 90%
 
 ![ Accuracy and loss logs of Pointnet++ semantic segmentation with fused features](assets/Geometric_Appearance_Epoch120.png)
 

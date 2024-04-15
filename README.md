@@ -8,18 +8,53 @@ Sematic Segmentation of tabletop object scene using pointnet2
 </figure>
 
 
-## Installation
+## Setp 1: Installation
 
-1. Install requirements.txt to a virtual environment (pvn3d)
-2. copy pvn3d/lib/pointnet_utils and utils folders
-2. Build Pointnet++ and copy the Iso file -- python3 setup.py build_ext
+1.1 Install requirements.txt to a virtual environment
 
-## Dataset
+```
+$ pip install -re requirements-txt
+```
+1.2 Install [python-pcl](https://github.com/strawlab/python-pcl)
 
-1. Download dataset
-2. Preprocess dataset
+1.3 Build [Pointnet++](https://github.com/erikwijmans/Pointnet2_PyTorch)
 
-## Train
+```
+$ python3 setup.py build_ext
+```
+## Step 2: Download/Generate dataset and preprocess for sampling
+
+2.1 Download dataset the dataset from [here]() or generate your own dataset following instructions [here](https://github.com/KulunuOS/6DAPose?tab=readme-ov-file#generate-the-dataset-locally) and copy them inside /datasets folder in root directory
+
+2.2 Remember to change the path names in the [dataloader](https://github.com/KulunuOS/Pointnet2_SemSeg/blob/main/lib/custom_dataloader.py) correctly according to you installaion
+
+2.3 Preprocess sampled data by following the Jupyter notebook [here](https://github.com/KulunuOS/Pointnet2_SemSeg/blob/main/Jupyter_notebooks/Dataset_Preprocessing.ipynb)
+
+2.4 Remember to confirm that you sampled data correctly by vizualizing the sampled data.
 
 
-## Test
+## Step 3: Train
+
+3.1 To train the network with only geometric features
+
+```
+$ python3 -m tarin.train_Seg.py
+```
+3.2 To train the network with fused geometric and appearance (Depth + RGB) features
+
+```
+$ python3 -m tarin.train_DenseSeg.py
+```
+
+## Step 4: Test
+
+The last section of this [notebook](https://github.com/KulunuOS/Pointnet2_SemSeg/blob/main/Jupyter_notebooks/Pointnet2_Segmentation.ipynb) provides with a script to test the trained model on unseen sålits of data
+
+## References
+
+1. PVN3D : https://github.com/ethnhe/PVN3D
+2. Pointnet++ Pytorch : https://github.com/erikwijmans/Pointnet2_PyTorch
+3. 6DAPose : https://github.com/KulunuOS/6DAPose?tab=readme-ov-file
+
+
+

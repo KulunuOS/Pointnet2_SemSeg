@@ -1,6 +1,6 @@
 # Pointnet2_Semantic_Segmentation
 
-This repository implements a pointnet++ based sementic segmentation task of a table top scene containing objects to be assembled by a cobot manipulator. A Semantic segmentation network trained with a pointnet++ backbone with different types of input features is evaluated for its performance accuracy. The dataset used in the implementation is a simulation based dataset of an assembly with corresponding assembly steps. For clarity, this implementation prioritizes the focus on the class imbalance problem over other important components in the sim2real gap domain such as noise, occlusions, non dataset objects and high level appearnce information such as surface textures. 
+This repository implements a pointnet2 based sementic segmentation task of a table top scene containing objects to be assembled by a cobot manipulator. A Semantic segmentation network trained with a pointnet2 backbone with different types of input features is evaluated for its performance accuracy. The dataset used in the implementation is a simulation based dataset of an assembly with corresponding assembly steps. For clarity, this implementation prioritizes the focus on the class imbalance problem over other important components in the sim2real gap domain such as noise, occlusions, non dataset objects and high level appearnce information such as surface textures. 
 
 
 <figure align="center" style="padding-top: 20px; padding-bottom: 20px;">

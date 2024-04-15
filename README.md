@@ -5,7 +5,7 @@ This repository implements a pointnet++ based sementic segmentation task of a ta
 
 <figure align="center" style="padding-top: 20px; padding-bottom: 20px;">
   <img src="/assets/semantic_segmentation_result.gif"/>
-  <figcaption>  <p style="text-align: center; font-size: 9px"> <a> Semantic Segmentation of Multi-step Assembling Scene from Nema17_Gear_Reducer dataset </a></p> </figcaption>
+  <figcaption> Semantic Segmentation of Multi-step Assembling Scene from Nema17_Gear_Reducer dataset</figcaption>
 </figure>
 
 
